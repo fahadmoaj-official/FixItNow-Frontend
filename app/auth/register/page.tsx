@@ -1,41 +1,41 @@
+"use client";
 
-"use client"
-
-import { useState } from "react"
-import Link from "next/link"
-import { Eye, EyeOff, Lock, Mail, UserRound, Wrench } from "lucide-react"
+import { useActionState, useEffect, useState } from "react";
+import Link from "next/link";
+import { Eye, EyeOff, Lock, Mail, UserRound, Wrench } from "lucide-react";
+import { registerActions } from "../_actions/RegisterAuthaction";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "TECHNICIAN",
-  })
+  const router = useRouter();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
+  const initialState = {
+    success: false,
+    message: "",
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const [state, action, pending] = useActionState(
+    registerActions,
+    initialState,
+  );
 
-    console.log(formData)
+  useEffect(() => {
+    if (!state.message) return;
 
-    
-  }
+    if (state.success) {
+      toast.success(state.message);
+      router.push("/login");
+    } else {
+      toast.error(state.message );
+    }
+  }, [state, router]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center px-4 py-10">
+    <main className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
@@ -53,9 +53,7 @@ export default function RegisterPage() {
 
         {/* Register Card */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 sm:p-8">
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-
+          <form action={action} className="space-y-5">
             {/* Name */}
             <div>
               <label
@@ -76,8 +74,6 @@ export default function RegisterPage() {
                   name="name"
                   type="text"
                   placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={handleChange}
                   required
                   className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                 />
@@ -103,9 +99,7 @@ export default function RegisterPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
+                  placeholder="example@example.com"
                   required
                   className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                 />
@@ -132,8 +126,6 @@ export default function RegisterPage() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
                   required
                   className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                 />
@@ -143,11 +135,7 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                 >
-                  {showPassword ? (
-                    <EyeOff size={19} />
-                  ) : (
-                    <Eye size={19} />
-                  )}
+                  {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                 </button>
               </div>
             </div>
@@ -170,14 +158,13 @@ export default function RegisterPage() {
                 <select
                   id="role"
                   name="role"
-                  value={formData.role}
-                  onChange={handleChange}
+                  defaultValue="TECHNICIAN"
                   required
                   className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                 >
                   <option value="TECHNICIAN">Technician</option>
                   <option value="CUSTOMER">Customer</option>
-                  <option value="ADMIN">Admin</option>
+                 
                 </select>
               </div>
             </div>
@@ -185,9 +172,10 @@ export default function RegisterPage() {
             {/* Register Button */}
             <button
               type="submit"
-              className="h-12 w-full rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.98]"
+              disabled={pending}
+              className="h-12 w-full rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Create Account
+              {pending ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
@@ -202,10 +190,7 @@ export default function RegisterPage() {
             </Link>
           </div>
         </div>
-
-      
       </div>
     </main>
-  )
+  );
 }
-

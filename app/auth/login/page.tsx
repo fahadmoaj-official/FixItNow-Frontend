@@ -8,9 +8,9 @@ import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner"
 import { useEffect } from "react"
 
-import { loginActions } from "../_actions/Authaction";
+import { loginActions } from "../_actions/LoginAuthaction";
 import jwt ,{ JwtPayload } from "jsonwebtoken";
-import { useRouter } from "next/dist/client/components/navigation";
+import { useRouter } from "next/navigation"
 
 const initialState = {
   success: false,
@@ -31,15 +31,15 @@ export default function LoginPage() {
       if (state.data) {
         const decodedToken = jwt.decode(state.data.accessToken) as JwtPayload;
         if (decodedToken.role === 'CUSTOMER') {
-          router.push('/customer-dashboard');
+          router.push('/customer');
         } else if (decodedToken.role === 'ADMIN') {
-          router.push('/admin-dashboard');
+          router.push('/admin');
         } else if (decodedToken.role === 'TECHNICIAN') {
-          router.push('/technician-dashboard');
+          router.push('/technician');
         }
       }
     } else {
-      toast.error("Login failed: " + state.message);
+      toast.error("Credentials are incorrect. Please try again.");
     }
   }
 }, [state])
