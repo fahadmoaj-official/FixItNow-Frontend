@@ -31,11 +31,11 @@ export default function LoginPage() {
       if (state.data) {
         const decodedToken = jwt.decode(state.data.accessToken) as JwtPayload;
         if (decodedToken.role === 'CUSTOMER') {
-          router.push('/customer');
+          router.push('/dashboard/customer');
         } else if (decodedToken.role === 'ADMIN') {
-          router.push('/admin');
+          router.push('/dashboard/admin');
         } else if (decodedToken.role === 'TECHNICIAN') {
-          router.push('/technician');
+          router.push('/dashboard/technician');
         }
       }
     } else {
